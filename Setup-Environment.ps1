@@ -5,10 +5,10 @@
 	The name of the deployment.
 .PARAMETER Location
     The location of the deployment.
-.PARAMETER SkipInfrastructure
-    Whether to skip the infrastructure deployment. Requires InfrastructureOutputs.json to exist in the infra directory.
+.PARAMETER SetupInfrastructure
+    Whether to setup the infrastructure deployment. Requires InfrastructureOutputs.json to exist in the infra directory.
 .EXAMPLE
-    .\Setup-Environment.ps1 -DeploymentName 'my-deployment' -Location 'swedencentral' -SkipInfrastructure $false
+    .\Setup-Environment.ps1 -DeploymentName 'my-deployment' -Location 'swedencentral' -SetupInfrastructure
 .NOTES
     Author: James Croft
 #>
@@ -19,8 +19,7 @@ param
     [string]$DeploymentName,
     [Parameter(Mandatory = $true)]
     [string]$Location,
-    [Parameter(Mandatory = $true)]
-    [string]$SkipInfrastructure
+    [switch]$SetupInfrastructure
 )
 
 function Set-ConfigurationFileVariable($configurationFile, $variableName, $variableValue) {
@@ -40,7 +39,7 @@ function Set-ConfigurationFileVariable($configurationFile, $variableName, $varia
 
 Write-Host "Starting environment setup..."
 
-if ($SkipInfrastructure -eq '$false' -or -not (Test-Path -Path './infra/InfrastructureOutputs.json')) {
+if ($SetupInfrastructure -or -not (Test-Path -Path './infra/InfrastructureOutputs.json')) {
     Write-Host "Deploying infrastructure..."
     $InfrastructureOutputs = (./infra/Deploy-Infrastructure.ps1 `
             -DeploymentName $DeploymentName `
